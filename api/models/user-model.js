@@ -1,7 +1,7 @@
 import { timeStamp } from "console";
 import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema({
-    useraname: {
+    username: {
         type: String,
         required: true,
         unique: true,
