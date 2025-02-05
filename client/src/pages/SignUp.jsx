@@ -9,7 +9,7 @@ const Signup = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
-    
+
   }
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,7 +31,7 @@ const Signup = () => {
         return setErrorMessage(data.message)
       }
       setLoading(false)
-      if(res.ok){
+      if (res.ok) {
         navigate('/sign-in')
       }
     } catch (error) {
@@ -83,14 +83,14 @@ const Signup = () => {
                 onChange={handleChange}
               />
             </div>
-            <Button gradientDuoTone='purpleToPink' className='w-full' type='submit' disabled={loading}>{loading ?(
+            <Button gradientDuoTone='purpleToPink' className='w-full' type='submit' disabled={loading}>{loading ? (
               <>
-              <Spinner size='sm'/>
-              <span>Loading...</span>
+                <Spinner size='sm' />
+                <span>Loading...</span>
               </>
-            ): "Sign Up"}</Button>
+            ) : "Sign Up"}</Button>
           </form>
-          <div className='flex gap-2 text-sm mt-5'>
+          <div className='flex gap-2 text-sm mt-5 justify-center'>
             <span>Have an account?</span>
             <Link to='/sign-in' className='text-blue-500'>Sign In</Link>
 
