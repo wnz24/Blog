@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import OAuth from '../components/OAuth'
 
 const Signin = () => {
   const [formData, setFormData] = useState({});
@@ -32,7 +33,6 @@ const Signin = () => {
       if (data.success === false) {
         dispatch(signInFailure(data.message))
       }
-
       if (res.ok) {
         dispatch(signInSuccess(data))
         navigate('/')
@@ -46,7 +46,6 @@ const Signin = () => {
     <div className='min-h-screen mt-20'>
       <div className='flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center'>
         {/* left side */}
-
         <div className='flex-1'>
           <Link to="/" className='font-bold dark:text-white text-4xl'>
             <span className='px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white'>Noor's</span>
@@ -59,8 +58,6 @@ const Signin = () => {
         {/* right side */}
         <div className='flex-1'>
           <form className='flex flex-col gap-3' onSubmit={handleSubmit}>
-
-
             <div>
               < Label value='Your email' />
               <TextInput
@@ -83,7 +80,9 @@ const Signin = () => {
                 <Spinner size='sm' />
                 <span>Loading...</span>
               </>
-            ) : "Sign In"}</Button>
+            ) : "Sign In"}
+            </Button>
+            <OAuth />
           </form>
           <div className='flex gap-2 text-sm mt-5 justify-center'>
             <span>Don't have an account?</span>
