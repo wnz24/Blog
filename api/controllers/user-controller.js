@@ -113,18 +113,13 @@ export const updateUser = async (req, res, next) => {
 };
 
 export const deleteUser = async (req, res, next) => {
-  if(req.user.id !== req.params.userId){
-    return next(errorHandler(401, "You are not authorized to delete this user"));
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'You are not allowed to delete this user'));
   }
   try {
-    const user = await User.findByIdAndDelete(req.params.userId);
-    if (!user) {
-      return next(errorHandler(404, "User not found"));
-    }
-    res.status(200).json({ message: "User deleted successfully" });
+    await User.findByIdAndDelete(req.params.userId);
+    res.status(200).json('User has been deleted');
   } catch (error) {
-    console.log(error);
-    return next(errorHandler(500, "Internal server error"));
+    next(error);
   }
-
-}
+};
