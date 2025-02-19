@@ -111,3 +111,20 @@ export const updateUser = async (req, res, next) => {
     return next(errorHandler(500, "Internal server error"));
   }
 };
+
+export const deleteUser = async (req, res, next) => {
+  if(req.user.id !== req.params.userId){
+    return next(errorHandler(401, "You are not authorized to delete this user"));
+  }
+  try {
+    const user = await User.findByIdAndDelete(req.params.userId);
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return next(errorHandler(500, "Internal server error"));
+  }
+
+}
