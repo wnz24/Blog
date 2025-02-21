@@ -1,7 +1,7 @@
 import { Alert, Button, Modal, TextInput } from 'flowbite-react'
 import React, { useRef, useState, useEffect} from 'react'
 import { useSelector } from "react-redux"
-import { updateStart,updateFailure,updateSuccess,deleteUserStart,deleteUserSuccess,deleteUserfailure
+import { updateStart,updateFailure,updateSuccess,deleteUserStart,deleteUserSuccess,deleteUserfailure,signoutSuccess
 
  } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
@@ -125,7 +125,7 @@ const DashProfile = () => {
       });
       const data = await res.json();
       if (!res.ok) {
-        dispatch(deleteUserFailure(data.message));
+        dispatch(deleteUserfailure(data.message));
       } else {
         dispatch(deleteUserSuccess(data));
         
@@ -134,6 +134,21 @@ const DashProfile = () => {
       dispatch(deleteUserfailure(error.message));
     }
   };
+  const handleSignout = async()=>{
+    try {
+      const res = await fetch('/api/user/signout',{
+        method:'POST',
+      });
+      const data = await res.json();
+      if(!res.ok){
+        console.log(error.message)
+      }else{
+        dispatch(signoutSuccess()); 
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
   
 
   return (
@@ -165,13 +180,13 @@ const DashProfile = () => {
 
       <div className='text-red-500 flex justify-between mt-2'>
         <span onClick={()=> setShowmodel(true)} className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Sign Out</span>
+        <span onClick={handleSignout} className='cursor-pointer'>Sign Out</span>
       </div>
       {updateUserSuccess &&(
         <Alert color='success' className='text-center'>
           {updateUserSuccess}
         </Alert>
-      )}
+        )}
       {updateUserError &&(
         <Alert color='failure' className='text-center'>
           {updateUserError}
