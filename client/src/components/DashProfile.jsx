@@ -1,26 +1,28 @@
 import { Alert, Button, Modal, TextInput } from 'flowbite-react'
-import React, { useRef, useState, useEffect} from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useSelector } from "react-redux"
-import { updateStart,updateFailure,updateSuccess,deleteUserStart,deleteUserSuccess,deleteUserfailure,signoutSuccess
+import {Link} from "react-router-dom"
+import {
+  updateStart, updateFailure, updateSuccess, deleteUserStart, deleteUserSuccess, deleteUserfailure, signoutSuccess
 
- } from '../redux/user/userSlice'
+} from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
-import { HiOutlineExclamationCircle } from 'react-icons/hi' 
+import { HiOutlineExclamationCircle } from 'react-icons/hi'
 import { use } from 'react'
 
 const DashProfile = () => {
-  const { currentUser,error } = useSelector((state) => state.user)
+  const { currentUser, error,loading } = useSelector((state) => state.user)
   const [imageFile, setImageFile] = useState(null);
   const [imageFileURL, setImageFileURL] = useState(currentUser.profilePhoto);
   const [imageFileUploaderror, setImageFileUploaderror] = useState(null);
-  const [ImageUploading,setImageUploading] = useState(false);
-  const [formData,setFormData] = useState({});
-  const [updateUserSuccess,setUpdateUserSuccess] = useState(null);
-  const [updateUserError,setUpdateUserError] = useState(null);
-  const [showmodel,setShowmodel] = useState(false);
+  const [ImageUploading, setImageUploading] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
+  const [updateUserError, setUpdateUserError] = useState(null);
+  const [showmodel, setShowmodel] = useState(false);
   const fileRef = useRef();
   const dispatch = useDispatch();
-  
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -68,7 +70,7 @@ const DashProfile = () => {
       if (response.ok) {
         setImageFileURL(data.imageUrl); // Update profile image URL after upload
         setImageUploading(false);
-        setFormData({...formData, profilePhoto: data.imageUrl});
+        setFormData({ ...formData, profilePhoto: data.imageUrl });
         console.log("Image uploaded successfully:", data.imageUrl);
       } else {
         console.error("Image upload failed:", data.error);
@@ -81,17 +83,17 @@ const DashProfile = () => {
       console.error("Error uploading image:", error);
     }
   };
-  const handleChange = (e) => { 
-    setFormData({...formData, [e.target.id]: e.target.value});
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(Object.keys(formData).length === 0){
+    if (Object.keys(formData).length === 0) {
       setUpdateUserError("No changes made");
       return;
     }
-    if(ImageUploading){
-      setUpdateUserError("Image is still uploading. Please wait");  
+    if (ImageUploading) {
+      setUpdateUserError("Image is still uploading. Please wait");
       return;
     }
     try {
@@ -100,19 +102,19 @@ const DashProfile = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
-        },  
+        },
         body: JSON.stringify(formData)
       });
-      const data = await response.json(); 
-      if(!response.ok){
+      const data = await response.json();
+      if (!response.ok) {
         dispatch(updateFailure(data.message));
         setUpdateUserError(data.message);
-      }else{
+      } else {
         dispatch(updateSuccess(data));
         setUpdateUserSuccess("User's profile updated successfully");
       }
     } catch (error) {
-      dispatch(updateFailure(error.message)); 
+      dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
     }
   }
@@ -128,28 +130,28 @@ const DashProfile = () => {
         dispatch(deleteUserfailure(data.message));
       } else {
         dispatch(deleteUserSuccess(data));
-        
+
       }
     } catch (error) {
       dispatch(deleteUserfailure(error.message));
     }
   };
-  const handleSignout = async()=>{
+  const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout',{
-        method:'POST',
+      const res = await fetch('/api/user/signout', {
+        method: 'POST',
       });
       const data = await res.json();
-      if(!res.ok){
+      if (!res.ok) {
         console.log(error.message)
-      }else{
-        dispatch(signoutSuccess()); 
+      } else {
+        dispatch(signoutSuccess());
       }
     } catch (error) {
       console.log(error)
     }
   }
-  
+
 
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
@@ -175,42 +177,57 @@ const DashProfile = () => {
         <TextInput type='email' id='email' placeholder='Email' defaultValue={currentUser.email} onChange={handleChange} />
         <TextInput type='password' id='password' placeholder='Password' onChange={handleChange} />
 
-        <Button type='submit' gradientDuoTone='purpleToBlue' outline>Update</Button>
+        <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled={loading || ImageUploading}>{loading ? "loading..." : "update"}</Button>
+        {
+          currentUser.isAdmin && (
+            <Link to={'/create-post'}>
+
+              <Button type='button' gradientDuoTone='purpleToPink' className='w-full'>
+                Create a post
+              </Button>
+            </Link>
+
+          )
+
+
+
+
+        }
       </form>
 
       <div className='text-red-500 flex justify-between mt-2'>
-        <span onClick={()=> setShowmodel(true)} className='cursor-pointer'>Delete Account</span>
+        <span onClick={() => setShowmodel(true)} className='cursor-pointer'>Delete Account</span>
         <span onClick={handleSignout} className='cursor-pointer'>Sign Out</span>
       </div>
-      {updateUserSuccess &&(
+      {updateUserSuccess && (
         <Alert color='success' className='text-center'>
           {updateUserSuccess}
         </Alert>
-        )}
-      {updateUserError &&(
+      )}
+      {updateUserError && (
         <Alert color='failure' className='text-center'>
           {updateUserError}
         </Alert>
       )}
-      {error &&(
+      {error && (
         <Alert color='failure' className='text-center'>
           {error}
         </Alert>
       )}
-      <Modal show={showmodel} onClose={()=> setShowmodel(false)} popup size='md'>
-       <Modal.Header />
-       <Modal.Body>
-        <div className="text-center">
-          <HiOutlineExclamationCircle className="text-5xl text-gray-500 dark:text-gray-200 mb-4 mx-auto" />
-          <h3>Are you sure you want to delete your account?</h3>
-          <div className='flex justify-center gap-4'>
+      <Modal show={showmodel} onClose={() => setShowmodel(false)} popup size='md'>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="text-5xl text-gray-500 dark:text-gray-200 mb-4 mx-auto" />
+            <h3>Are you sure you want to delete your account?</h3>
+            <div className='flex justify-center gap-4'>
 
-          <Button onClick={handleDeleteUser} color='failure' className='mt-4 '>Yes, I'm sure</Button>  
-          <Button onClick={()=> setShowmodel(false)} color='gray' className='mt-4'>cancel</Button>  
+              <Button onClick={handleDeleteUser} color='failure' className='mt-4 '>Yes, I'm sure</Button>
+              <Button onClick={() => setShowmodel(false)} color='gray' className='mt-4'>cancel</Button>
+            </div>
           </div>
-        </div>
         </Modal.Body>
-        </Modal>
+      </Modal>
     </div>
   )
 }
