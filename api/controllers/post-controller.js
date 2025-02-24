@@ -79,3 +79,53 @@ export const uploadImage = async (req, res) => {
         }
     });
 };
+
+export const getPosts = async (req, res, next) => {
+    try {
+        const startIndex = parseInt(req.query.startIndex) || 0;
+        const limit = parseInt(req.query.limit) || 9;
+        const sortDirection = req.query.order === 'asc' ? 1 : -1;
+
+        // Construct filters for querying posts
+        const filters = {};
+        if (req.query.userId) filters.userId = req.query.userId;
+        if (req.query.category) filters.category = req.query.category;
+        if (req.query.slug) filters.slug = req.query.slug;
+        if (req.query.postId) filters._id = req.query.postId;
+        if (req.query.searchTerm) {
+            filters.$or = [
+                { title: { $regex: req.query.searchTerm, $options: 'i' } },
+                { content: { $regex: req.query.searchTerm, $options: 'i' } },
+            ];
+        }
+
+        // Fetch posts based on filters
+        const posts = await Post.find(filters)
+            .sort({ updatedAt: sortDirection })
+            .skip(startIndex)
+            .limit(limit);
+
+        // Get total number of posts (without filters)
+        const totalPosts = await Post.countDocuments();
+
+        // Calculate last month's posts
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        const lastMonthPosts = await Post.countDocuments({
+            createdAt: { $gte: oneMonthAgo }
+        });
+
+        // Return the response
+        res.status(200).json({
+            posts,
+            filteredTotal: await Post.countDocuments(filters), // Total posts after filters
+            totalPosts, // Total posts without filters
+            lastMonthPosts
+        });
+
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
