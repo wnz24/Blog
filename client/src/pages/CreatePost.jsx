@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
 import categories from "../util/Categories";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { modules, formats } from "../util/QuillConfig"; 
+import { modules, formats } from "../util/QuillConfig";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 
 const CreatePost = () => {
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const [publisherror, setPublisherror] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     category: "uncategorized",
     content: "",
-    image: currentUser?.profilePhoto || null,
+    image: imageFile,
   });
 
   const handleChange = (e) => {
@@ -66,10 +70,35 @@ const CreatePost = () => {
       setImageFileUploadError("Image upload failed.");
       setImageUploading(false);
     }
-  }; 
+  };
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    console.log("Publish Error Updated:", publisherror);
+  }, [publisherror]);
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const res = await fetch("/api/post/create", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPublisherror(data.message)
+        return
+      } 
+      if(res.ok) {
+        setPublisherror(null)
+        navigate(`/post/${data.slug}`)
+      }
+    } catch (error) {
+
+      setPublisherror(error.message)
+    }
     console.log("Post Data:", formData);
   };
 
@@ -110,14 +139,14 @@ const CreatePost = () => {
             {imageUploading ? "Uploading..." : "Upload Image"}
           </Button>
         </div>
-        {imageFileUploadError &&(
+        {imageFileUploadError && (
           <Alert color="failure">{imageFileUploadError}</Alert>
         )}
         {formData.image && (
           <img
-          src={formData.image}
-          alt="upload"
-          className="w-full h-72 object-cover"
+            src={formData.image}
+            alt="upload"
+            className="w-full h-72 object-cover"
           />
         )}
 
@@ -136,6 +165,12 @@ const CreatePost = () => {
         <Button type="submit" gradientDuoTone="purpleToPink">
           Publish
         </Button>
+        {publisherror && (
+          <Alert
+          color="failure" className="mt-5">
+          {publisherror}
+          </Alert>
+        )}
       </form>
     </div>
   );
