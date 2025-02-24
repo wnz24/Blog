@@ -8,7 +8,7 @@ import {
 } from '../redux/user/userSlice'
 import { useDispatch } from 'react-redux'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
-import { use } from 'react'
+
 
 const DashProfile = () => {
   const { currentUser, error,loading } = useSelector((state) => state.user)

@@ -1,30 +1,76 @@
 import React, { useState } from "react";
-import { Button, FileInput, Select, TextInput } from "flowbite-react";
+import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
 import categories from "../util/Categories";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { modules, formats } from "../util/QuillConfig"; // Import Configurations
+import { modules, formats } from "../util/QuillConfig"; 
+import { useSelector } from "react-redux";
 
 const CreatePost = () => {
-  const [postData, setPostData] = useState({
+  const { currentUser } = useSelector((state) => state.user);
+  const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [formData, setFormData] = useState({
     title: "",
     category: "uncategorized",
     content: "",
-    image: null,
+    image: currentUser?.profilePhoto || null,
   });
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setPostData((prev) => ({ ...prev, [id]: value }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleFileChange = (e) => {
-    setPostData((prev) => ({ ...prev, image: e.target.files[0] }));
+    setImageFile(e.target.files[0]);
   };
+
+  const handleUploadImage = async () => {
+    if (!imageFile) return;
+
+    const allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+    const fileExtension = imageFile.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      setImageFileUploadError("Invalid file format. Please upload an image.");
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (imageFile.size > maxSize) {
+      setImageFileUploadError("File size exceeds the 5MB limit.");
+      return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append("image", imageFile);
+
+    try {
+      setImageUploading(true);
+      const response = await fetch("/api/post/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setFormData((prev) => ({ ...prev, image: data.imageUrl }));
+        setImageUploading(false);
+      } else {
+        setImageFileUploadError("Image upload failed.");
+        setImageUploading(false);
+      }
+    } catch (error) {
+      setImageFileUploadError("Image upload failed.");
+      setImageUploading(false);
+    }
+  }; 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Post Data:", postData);
+    console.log("Post Data:", formData);
   };
 
   return (
@@ -38,10 +84,10 @@ const CreatePost = () => {
             required
             id="title"
             className="flex-1"
-            value={postData.title}
+            value={formData.title}
             onChange={handleChange}
           />
-          <Select id="category" value={postData.category} onChange={handleChange}>
+          <Select id="category" value={formData.category} onChange={handleChange}>
             <option value="uncategorized">Select a category</option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
@@ -53,18 +99,36 @@ const CreatePost = () => {
 
         <div className="flex items-center gap-4 border border-teal-500 border-dotted p-3 rounded">
           <FileInput type="file" accept="image/*" onChange={handleFileChange} />
-          <Button type="button" gradientDuoTone="purpleToBlue" size="sm" outline>
-            Upload Image
+          <Button
+            type="button"
+            gradientDuoTone="purpleToBlue"
+            size="sm"
+            outline
+            onClick={handleUploadImage}
+            disabled={imageUploading}
+          >
+            {imageUploading ? "Uploading..." : "Upload Image"}
           </Button>
         </div>
+        {imageFileUploadError &&(
+          <Alert color="failure">{imageFileUploadError}</Alert>
+        )}
+        {formData.image && (
+          <img
+          src={formData.image}
+          alt="upload"
+          className="w-full h-72 object-cover"
+          />
+        )}
 
-        {/* ReactQuill Editor with Imported Configurations */}
+        {imageFileUploadError && <p className="text-red-500 text-sm">{imageFileUploadError}</p>}
+
         <ReactQuill
           theme="snow"
           placeholder="Write something amazing..."
           className="h-72 mb-12"
-          value={postData.content}
-          onChange={(content) => setPostData((prev) => ({ ...prev, content }))}
+          value={formData.content}
+          onChange={(content) => setFormData((prev) => ({ ...prev, content }))}
           modules={modules}
           formats={formats}
         />
