@@ -24,12 +24,10 @@ app.use('/api/user', userRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/post', postRoutes)
 
-app.use((error,req,res,next)=>{
-    const statusCode = error.statusCode || 500
-    const message = error.message || 'Internal server error';
-    res.status(statusCode).json({
+app.use((err, req, res, next) => {
+    console.error("Error:", err); // Debugging log
+    res.status(err.status || 500).json({
         success: false,
-        statusCode,
-        message
-    })
-})
+        message: err.message || "Internal Server Error",
+    });
+});
