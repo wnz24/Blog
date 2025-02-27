@@ -85,8 +85,8 @@ const DashPosts = () => {
               <Table.HeadCell><span>Edit</span></Table.HeadCell>
             </Table.Head>
             {userPosts.map((post) => (
-              <Table.Body className='divide-y'>
-                <React.Fragment key={post._id}>
+              <Table.Body className='divide-y'  key={post._id}>
+               
                 <Table.Row  className='bg-white dark:border-gray-700 dark:bg-gray-800'>
                   <Table.Cell>{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
                   <Table.Cell>
@@ -122,7 +122,7 @@ const DashPosts = () => {
 
 
                 </Table.Row>
-                </React.Fragment>
+               
               </Table.Body>
             ))}
 
