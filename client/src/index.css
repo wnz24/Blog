@@ -8,3 +8,102 @@ body{
 .ql-editor{
     font-size: 1.05rem;
 }
+/* General Post Content */
+.post-content {
+    font-family: sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Paragraph Styling */
+.post-content p {
+    margin-bottom: 0.5rem;
+}
+
+/* Headings */
+.post-content h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: sans-serif;
+    margin: 1.5rem 0;
+}
+
+.post-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: sans-serif;
+    margin: 1.5rem 0;
+}
+
+.post-content h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.2rem 0;
+}
+
+/* Links */
+.post-content a {
+    color: rgb(73, 149, 199);
+    text-decoration: none;
+}
+
+.post-content a:hover {
+    text-decoration: underline;
+}
+
+.dark .post-content a:hover {
+    color: rgb(73, 149, 199);
+}
+
+/* Code Snippets */
+.post-content pre {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+}
+
+.post-content code {
+    background: #f4f4f4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+}
+
+/* Dark Mode for Code */
+.dark .post-content pre {
+    background: #282c34;
+    color: #abb2bf;
+}
+
+.dark .post-content code {
+    background: #3a3f4b;
+    color: #e6e6e6;
+}
+
+/* Blockquote */
+.post-content blockquote {
+    border-left: 4px solid #4a90e2;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #555;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .post-content pre {
+        font-size: 0.9rem;
+    }
+
+    .post-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .post-content h2 {
+        font-size: 1.3rem;
+    }
+}

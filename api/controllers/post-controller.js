@@ -85,7 +85,7 @@ export const getPosts = async (req, res, next) => {
         const startIndex = parseInt(req.query.startIndex) || 0;
         const limit = parseInt(req.query.limit) || 9;
         const sortDirection = req.query.order === 'asc' ? 1 : -1;
-
+        
         // Construct filters for querying posts
         const filters = {};
         if (req.query.userId) filters.userId = req.query.userId;
@@ -98,6 +98,7 @@ export const getPosts = async (req, res, next) => {
                 { content: { $regex: req.query.searchTerm, $options: 'i' } },
             ];
         }
+        
 
         // Fetch posts based on filters
         const posts = await Post.find(filters)
