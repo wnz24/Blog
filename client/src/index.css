@@ -73,10 +73,13 @@ body{
     font-size: 0.95rem;
 }
 
+.dark .post-content {
+    color: #ffffff !important; /* Ensures text is white */
+}
 /* Dark Mode for Code */
 .dark .post-content pre {
-    background: #282c34;
-    color: #abb2bf;
+    background: #282c34 !important;
+    color: #eef2f9 !important;
 }
 
 .dark .post-content code {

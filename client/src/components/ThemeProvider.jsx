@@ -1,17 +1,22 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-const ThemeProvider = ({children}) => {
-    const {theme} = useSelector(state=> state.theme)
-  return (
-    <div className={theme}>
-        <div className='bg-white text-gray-700 min-h-screen dark:text-gray-200 dark:bg-[rgb(16,23,42)]'>
-        {children}
+const ThemeProvider = ({ children }) => {
+    const { theme } = useSelector(state => state.theme);
 
+    useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark'); // Apply to <html>
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [theme]); // Re-run when theme changes
+
+    return (
+        <div className="bg-white text-gray-700 min-h-screen dark:text-gray-200 dark:bg-[rgb(16,23,42)]">
+            {children}
         </div>
-      
-    </div>
-  )
-}
+    );
+};
 
-export default ThemeProvider
+export default ThemeProvider;
