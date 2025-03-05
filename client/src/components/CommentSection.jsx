@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from "react-redux"
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Alert, Button, Textarea } from "flowbite-react"
 import Comment from './Comment';
 
@@ -8,19 +8,20 @@ const CommentSection = ({ postId }) => {
     const { currentUser } = useSelector((state) => state.user);
     const [comment, setComment] = useState('')
     const [commentError, setCommentError] = useState(null); // Fixed typo
-    const [comments,setComments] = useState([])
-    console.log("Comments:",comments)
+    const [comments, setComments] = useState([])
+
+    console.log("Comments:", comments)
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Corrected validation logic
-        if (!comment.trim()) { 
-            setCommentError("Comment cannot be empty."); 
+        if (!comment.trim()) {
+            setCommentError("Comment cannot be empty.");
             return;
         }
-        if (comment.length > 200) { 
+        if (comment.length > 200) {
             setCommentError("Comment cannot exceed 200 characters.");
             return;
         }
@@ -35,9 +36,9 @@ const CommentSection = ({ postId }) => {
             const data = await res.json();
 
             if (res.ok) {
-                setComment(''); 
+                setComment('');
                 setCommentError(null);
-                setComments([data,...comments]);
+                setComments([data, ...comments]);
             } else {
                 setCommentError(data.message || "Failed to submit comment.");
             }
@@ -46,20 +47,21 @@ const CommentSection = ({ postId }) => {
         }
     };
 
-    const handleOnLike= async (commentId)=>{
+    const handleOnLike = async (commentId) => {
         try {
-            if(!currentUser){
+            if (!currentUser) {
                 navigate('/sign-in');
                 return
             }
-            const res = await fetch (`/api/comment/likeComment/${commentId}`,{
-                method: 'PUT'}
+            const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+                method: 'PUT'
+            }
             )
-            if(res.ok){
-                 const data = await res.json();
-                 setComments(comments.map((comment) => 
-                    comment._id === commentId 
-                        ? { ...comment, likes: data.likes, numberOfLikes: data.numberOfLikes } 
+            if (res.ok) {
+                const data = await res.json();
+                setComments(comments.map((comment) =>
+                    comment._id === commentId
+                        ? { ...comment, likes: data.likes, numberOfLikes: data.numberOfLikes }
                         : comment
                 ));
             }
@@ -69,19 +71,27 @@ const CommentSection = ({ postId }) => {
         }
     }
 
+    const handleEdit = async (comment, editedContent) => {
+        setComments(
+            comments.map((c) => 
+                c._id === comment._id ? { ...c, content: editedContent } : c
+            )
+        )
+    }
+
     useEffect(() => {
-        const getComments = async ()=>{
+        const getComments = async () => {
             try {
                 const res = await fetch(`/api/comment/getPostComments/${postId}`)
                 const data = await res.json();
                 setComments(data);
             } catch (error) {
-             console.log(error)   
+                console.log(error)
             }
         }
         getComments();
     }, [postId])
-    
+
 
     return (
         <div className='max-w-2xl mx-auto w-full p-3'>
@@ -99,7 +109,7 @@ const CommentSection = ({ postId }) => {
             )}
             {currentUser && (
                 <form className='border border-teal-500 rounded-md p-3' onSubmit={handleSubmit}>
-                    <Textarea 
+                    <Textarea
                         placeholder='Add a comment...'
                         rows='3'
                         maxLength='200'
@@ -119,18 +129,26 @@ const CommentSection = ({ postId }) => {
                 <p className='text-sm my-5'>No comments yet!</p>
             ) : (
                 <>
-                <div className='text-sm my-5 flex items-center gap-1'>
-                    <p>Comments</p>
-                    <div className='border border-gray-400 py-1 px-2 rounded-sm'>
-                        <p>{comments.length}</p>
+                    <div className='text-sm my-5 flex items-center gap-1'>
+                        <p>Comments</p>
+                        <div className='border border-gray-400 py-1 px-2 rounded-sm'>
+                            <p>{comments.length}</p>
+                        </div>
                     </div>
-                </div>
-                {comments.map((comment)=>(
-                    <Comment key={comment._id}
-                    comment={comment}
-                    onLike = {handleOnLike}
-                    />
-                ))}
+                    {Array.isArray(comments) && comments.length > 0 ? (
+                        comments.map((comment) =>
+                            comment ? (
+                                <Comment
+                                    key={comment._id}
+                                    comment={comment}
+                                    onLike={handleOnLike}
+                                    onEdit={handleEdit}
+                                />
+                            ) : null
+                        )
+                    ) : (
+                        <p>No comments available</p>
+                    )}
                 </>
             )}
         </div>

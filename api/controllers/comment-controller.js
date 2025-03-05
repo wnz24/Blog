@@ -1,5 +1,7 @@
+
 import Comment from "../models/comment-model.js";
 import {errorHandler} from "../utils/error.js"
+import mongoose from "mongoose";
 
 
 export const createComment = async (req,res,next)=>{
@@ -50,3 +52,37 @@ export const likeComment = async (req,res,next) =>{
         
     }
 }
+
+export const editComment = async (req, res, next) => {
+    try {
+        const {commentId } = req.params; // Extract ID from URL
+        console.log("CommentId:", commentId);
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(commentId)) {
+            return next(errorHandler(400, "Invalid comment ID"));
+        }
+
+        // Find the comment
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return next(errorHandler(404, "Comment not found"));
+        }
+
+        // Check user permission
+        if (comment.userId.toString() !== req.user.id && !req.user.isAdmin) {
+            return next(errorHandler(403, "You are not allowed to edit this comment"));
+        }
+
+        // Update only the content
+        const editedComment = await Comment.findByIdAndUpdate(
+            commentId, // Find by ID
+            { content: req.body.content }, // Update only the content
+            { new: true } // Return updated document
+        );
+
+        res.status(200).json(editedComment);
+    } catch (error) {
+        next(error);
+    }
+};
