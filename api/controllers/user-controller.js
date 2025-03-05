@@ -2,7 +2,7 @@ import cloudinary from "../../cloudinaryConfig.js";
 import multer from "multer";
 import dotenv from "dotenv";
 import bcryptjs from "bcryptjs";
-import {errorHandler} from "../utils/error.js";
+import { errorHandler } from "../utils/error.js";
 import User from "../models/user-model.js";
 dotenv.config();
 
@@ -48,7 +48,7 @@ export const uploadImage = async (req, res) => {
         uploadStream.end(req.file.buffer);
       });
 
-      res.json({imageUrl: uploadResult.secure_url });
+      res.json({ imageUrl: uploadResult.secure_url });
     } catch (error) {
       console.error("Upload failed:", error.message || error);
       res.status(500).json({ error: "Upload failed: " + (error.message || error) });
@@ -124,26 +124,26 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
-export const signout = async (req,res,next) =>{
-  try{
+export const signout = async (req, res, next) => {
+  try {
     res.clearCookie('access_token').status(200).json('User has been signed out');
-  }catch(error){
+  } catch (error) {
     next(error)
   }
 };
 
-export const getUsers =async (req,res,next)=>{
-  if(!req.user.isAdmin){
-    return next(errorHandler(403,"You are not allowed to see all users"));
+export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, "You are not allowed to see all users"));
   }
   try {
-    const  startIndex = parseInt(req.query.startIndex) || 0;
+    const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
     const sortDirection = req.query.sort === 'asc' ? 1 : -1;
-    const users = await User.find().sort({createdAt: sortDirection}).skip(startIndex).limit(limit);
+    const users = await User.find().sort({ createdAt: sortDirection }).skip(startIndex).limit(limit);
 
-    const UserswithoutPasswords = users.map((user)=>{
-      const {password,...rest} = user._doc;
+    const UserswithoutPasswords = users.map((user) => {
+      const { password, ...rest } = user._doc;
       return rest;
     })
     const totalUsers = await User.countDocuments();
@@ -153,15 +153,28 @@ export const getUsers =async (req,res,next)=>{
       now.getMonth(),
       now.getDate()
     );
-    const  lastMonthUsers = await User.countDocuments({
-      createdAt: {$gte: oneMonthAgo},
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
 
     })
     res.status(200).json({
-      users:UserswithoutPasswords,
+      users: UserswithoutPasswords,
       totalUsers,
       lastMonthUsers
     })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(
+      req.params.userId);
+      if(!user){
+        return next(errorHandler(404,"User not found"))
+      }
+    const { password, ...rest } = user._doc;
+    res.status(200).json(rest);
   } catch (error) {
     next(error)
   }
