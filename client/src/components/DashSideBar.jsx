@@ -1,6 +1,6 @@
 import React from 'react'
 import { Sidebar, SidebarItem } from 'flowbite-react'
-import { HiAnnotation, HiDocumentText, HiOutlineUserGroup, HiUser } from 'react-icons/hi'
+import { HiAnnotation, HiChartPie, HiDocumentText, HiOutlineUserGroup, HiUser } from 'react-icons/hi'
 import { HiArrowSmRight } from "react-icons/hi";
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -38,6 +38,15 @@ const DashSideBar = () => {
     <Sidebar className='w-full md:w-56'>
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col'>
+          {currentUser && currentUser.isAdmin && (
+            <Link to='/dashboard?tab=dash'>
+              <Sidebar.Item
+                active={tab === 'dash' || !tab}
+                icon={HiChartPie}
+                as='div'
+              >Dashboard</Sidebar.Item>
+            </Link>
+          )}
           <Link to={'/dashboard?tab=profile'}>
             <Sidebar.Item active={tab === 'profile'} icon={HiUser} label={currentUser.isAdmin ? "Admin" : "User"} labelColor='dark' className='cursor-pointer' as='div'>
               Profile

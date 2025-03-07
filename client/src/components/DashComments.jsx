@@ -96,7 +96,7 @@ const DashComments = () => {
                     {comment.content}
                   </Table.Cell>
                   <Table.Cell>
-                   {comment.numberOfLikes}
+                   {Number(comment.numberOfLikes)}
                   </Table.Cell>
                   <Table.Cell>
                     {comment.postId}
