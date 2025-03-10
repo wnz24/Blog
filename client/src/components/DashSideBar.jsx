@@ -10,6 +10,7 @@ const DashSideBar = () => {
   const { currentUser } = useSelector((state) => state.user)
   const location = useLocation()
   const [tab, setTab] = useState('')
+  const dispatch = useDispatch();
   useEffect(() => {
     const urlParam = new URLSearchParams(location.search)
     const tabFormUrl = urlParam.get('tab')

@@ -3,31 +3,39 @@ import { Link } from 'react-router-dom'
 
 const PostCard = ({ post }) => {
   return (
-    <div className='group relative w-full border border-teal-500 hover:border-2 min-h-[350px] overflow-hidden rounded-lg sm:w-[380px] transition-all flex flex-col'>
+    <div className="group relative w-full min-w-[280px] max-w-[340px] bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg duration-300 flex flex-col">
       
-      {/* Image */}
-      <Link to={`/post/${post.slug}`} className="w-full">
+      {/* Image Section */}
+      <Link to={`/post/${post?.slug}`} className="relative w-full block">
         <img 
-          src={post.image} 
-          alt={post.slug} 
-          className='h-[180px] w-full object-cover transition-all duration-300'
+          src={post?.image || "https://via.placeholder.com/300"} 
+          alt={post?.title || "Post Image"} 
+          className="h-[180px] w-full object-cover"
         />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </Link>
 
-      {/* Content */}
-      <div className='p-3 flex flex-col gap-2 flex-grow'>
-        <p className='text-lg font-semibold line-clamp-2'>{post.title}</p>
-        <span className='italic text-sm'>{post.category}</span>
+      {/* Content Section */}
+      <div className="p-3 flex flex-col flex-grow">
+        {/* Category */}
+        <span className="text-sm font-medium text-teal-600 uppercase tracking-wide">{post?.category || "Uncategorized"}</span>
 
-        {/* Button inside the content flow */}
-        <div className="mt-auto">
-          <Link 
-            to={`/post/${post.slug}`} 
-            className='border border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md block'
-          >
-            React article
-          </Link>
-        </div>
+        {/* Title */}
+        <p className="text-lg font-semibold text-gray-900 line-clamp-2">
+          {post?.title || "Untitled Post"}
+        </p>
+
+        {/* Spacer to push the button down */}
+        <div className="flex-grow"></div>
+
+        {/* Button */}
+        <Link 
+          to={`/post/${post?.slug}`} 
+          className="border border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md block font-medium"
+        >
+          Read More
+        </Link>
       </div>
 
     </div>
