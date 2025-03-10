@@ -1,9 +1,9 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PostCard = ({ post }) => {
   return (
-    <div className="group relative w-full min-w-[280px] max-w-[340px] bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg duration-300 flex flex-col">
+    <div className="group relative w-full min-w-[280px] max-w-[340px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-[1.02] hover:shadow-lg duration-300 flex flex-col">
       
       {/* Image Section */}
       <Link to={`/post/${post?.slug}`} className="relative w-full block">
@@ -19,10 +19,12 @@ const PostCard = ({ post }) => {
       {/* Content Section */}
       <div className="p-3 flex flex-col flex-grow">
         {/* Category */}
-        <span className="text-sm font-medium text-teal-600 uppercase tracking-wide">{post?.category || "Uncategorized"}</span>
+        <span className="text-sm font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wide">
+          {post?.category || "Uncategorized"}
+        </span>
 
         {/* Title */}
-        <p className="text-lg font-semibold text-gray-900 line-clamp-2">
+        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
           {post?.title || "Untitled Post"}
         </p>
 
@@ -32,14 +34,14 @@ const PostCard = ({ post }) => {
         {/* Button */}
         <Link 
           to={`/post/${post?.slug}`} 
-          className="border border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md block font-medium"
+          className="border border-teal-500 dark:border-teal-400 text-teal-500 dark:text-teal-400 hover:bg-teal-500 dark:hover:bg-teal-400 hover:text-white dark:hover:text-gray-900 transition-all duration-300 text-center py-2 rounded-md block font-medium"
         >
           Read More
         </Link>
       </div>
 
     </div>
-  )
-}
+  );
+};
 
-export default PostCard
+export default PostCard;
