@@ -39,40 +39,40 @@ const Search = () => {
         const searchTermFromURL = urlParams.get('searchTerm') || '';
         const sortFromUrl = urlParams.get('sort') || 'desc';
         const categoryFormUrl = urlParams.get('category') || 'uncategorized';
-    
+
         // Update state based on URL params
         setSideBarData({
             searchTerm: searchTermFromURL,
             sort: sortFromUrl,
             category: categoryFormUrl,
         });
-    
+
         const fetchPosts = async () => {
             setLoading(true);
-    
+
             // Remove empty filters from URL parameters
             if (!searchTermFromURL) urlParams.delete('searchTerm');
             if (!sortFromUrl || sortFromUrl === 'desc') urlParams.delete('sort');
             if (!categoryFormUrl || categoryFormUrl === 'uncategorized') urlParams.delete('category');
-    
+
             const searchQuery = urlParams.toString();
             const endpoint = searchQuery ? `/api/post/getposts?${searchQuery}` : `/api/post/getposts`;
-    
+
             const res = await fetch(endpoint);
             if (!res.ok) {
                 setLoading(false);
                 return;
             }
-    
+
             const data = await res.json();
             setPosts(data.posts);
             setLoading(false);
             setShowMore(data.posts.length === 9);
         };
-    
+
         fetchPosts();
     }, [location.search]);
-    
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -155,7 +155,9 @@ const Search = () => {
                         No Posts found.
                     </p>)}
                     {loading && (
-                        <div className='flex justify-center items-center min-h-screen'><Spinner size='xl' /></div>
+                        <div className="flex justify-center items-center min-h-[50vh] w-full">
+                            <Spinner size="xl" />
+                        </div>
                     )}
                     {!loading && posts && posts.map((post) => (
                         <PostCard post={post} />
